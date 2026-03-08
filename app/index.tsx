@@ -1,168 +1,102 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Heart, Sparkles, Users } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const { width, height } = Dimensions.get('window');
+import { Lock, MessageCircle } from 'lucide-react-native';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { user, loading } = useAuth();
-
-  useEffect(() => {
-    if (!loading && user) {
-      checkUserProfile();
-    }
-  }, [user, loading]);
-
-  const checkUserProfile = async () => {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user?.id)
-      .maybeSingle();
-
-    // Handle the case where no profile exists (new user)
-    if (!profile) {
-      router.replace('/onboarding');
-      return;
-    }
-
-    // Handle other errors
-    if (error) {
-      console.error('Error checking user profile:', error);
-      return;
-    }
-
-    router.replace('/(tabs)');
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
 
   return (
-    <LinearGradient
-      colors={['#3B82F6', '#1E40AF']}
-      style={styles.container}
-    >
-      <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Heart size={60} color="#FFFFFF" strokeWidth={2} />
-          <Text style={styles.logoText}>LoveConnect</Text>
-        </View>
-
-        <View style={styles.featuresContainer}>
-          <View style={styles.feature}>
-            <Users size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Find Your Match</Text>
-          </View>
-          <View style={styles.feature}>
-            <Sparkles size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Smart Matching</Text>
-          </View>
-          <View style={styles.feature}>
-            <Heart size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Real Connections</Text>
-          </View>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push('/auth')}
-          >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/auth?mode=signin')}
-          >
-            <Text style={styles.secondaryButtonText}>I Already Have an Account</Text>
-          </TouchableOpacity>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.logo}>
+        <MessageCircle size={64} color="#FFFFFF" />
       </View>
-    </LinearGradient>
+      <Text style={styles.title}>WhatsApp</Text>
+      <Text style={styles.subtitle}>
+        Simple, reliable, private messaging inspired by the original experience.
+      </Text>
+
+      <View style={styles.encryption}>
+        <Lock size={16} color="#065F46" />
+        <Text style={styles.encryptionText}>End-to-end encrypted chats and calls</Text>
+      </View>
+
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={() => router.replace('/(tabs)')}
+      >
+        <Text style={styles.primaryButtonText}>Continue</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.footer}>
+        By continuing, you agree to our Terms & Privacy Policy.
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#075E54',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 24,
   },
-  content: {
-    flex: 1,
+  logo: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#25D366',
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 60,
-  },
-  logoText: {
-    fontSize: 36,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    marginTop: 16,
-  },
-  featuresContainer: {
-    marginBottom: 80,
-  },
-  feature: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 24,
   },
-  featureText: {
-    fontSize: 18,
-    fontFamily: 'Inter-Medium',
+  title: {
+    fontSize: 32,
+    fontFamily: 'Inter-Bold',
     color: '#FFFFFF',
-    marginLeft: 16,
   },
-  buttonContainer: {
-    width: '100%',
-    gap: 16,
+  subtitle: {
+    marginTop: 12,
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#D1FAE5',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  encryption: {
+    marginTop: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#ECFDF3',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+  },
+  encryptionText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Medium',
+    color: '#065F46',
   },
   primaryButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
+    marginTop: 32,
+    backgroundColor: '#25D366',
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    borderRadius: 28,
   },
   primaryButtonText: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#3B82F6',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  secondaryButtonText: {
     fontSize: 16,
-    fontFamily: 'Inter-Medium',
+    fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
   },
-  loadingText: {
-    fontSize: 18,
-    fontFamily: 'Inter-Medium',
-    color: '#666666',
+  footer: {
+    marginTop: 20,
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#C7F9CC',
+    textAlign: 'center',
   },
 });

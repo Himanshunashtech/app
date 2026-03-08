@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Heart, MessageCircle, User, Compass } from 'lucide-react-native';
+import { MessageCircle, Circle, Phone, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -14,7 +14,7 @@ export default function TabLayout() {
           paddingBottom: 20,
           paddingTop: 12,
         },
-        tabBarActiveTintColor: '#3B82F6',
+        tabBarActiveTintColor: '#128C7E',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarLabelStyle: {
           fontSize: 12,
@@ -25,36 +25,36 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Discover',
-          tabBarIcon: ({ size, color }) => (
-            <Compass size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="matches"
-        options={{
-          title: 'Matches',
-          tabBarIcon: ({ size, color }) => (
-            <Heart size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="messages"
-        options={{
-          title: 'Messages',
+          title: 'Chats',
           tabBarIcon: ({ size, color }) => (
             <MessageCircle size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
+        name="matches"
+        options={{
+          title: 'Status',
+          tabBarIcon: ({ size, color }) => (
+            <Circle size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="messages"
+        options={{
+          title: 'Calls',
+          tabBarIcon: ({ size, color }) => (
+            <Phone size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: 'Settings',
           tabBarIcon: ({ size, color }) => (
-            <User size={size} color={color} />
+            <Settings size={size} color={color} />
           ),
         }}
       />
