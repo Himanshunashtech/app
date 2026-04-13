@@ -1,168 +1,38 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Heart, Sparkles, Users } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const { width, height } = Dimensions.get('window');
+import { Lock, MessageCircle, Phone, ShieldCheck } from 'lucide-react-native';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { user, loading } = useAuth();
-
-  useEffect(() => {
-    if (!loading && user) {
-      checkUserProfile();
-    }
-  }, [user, loading]);
-
-  const checkUserProfile = async () => {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user?.id)
-      .maybeSingle();
-
-    // Handle the case where no profile exists (new user)
-    if (!profile) {
-      router.replace('/onboarding');
-      return;
-    }
-
-    // Handle other errors
-    if (error) {
-      console.error('Error checking user profile:', error);
-      return;
-    }
-
-    router.replace('/(tabs)');
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
 
   return (
-    <LinearGradient
-      colors={['#3B82F6', '#1E40AF']}
-      style={styles.container}
-    >
-      <View style={styles.content}>
-        <View style={styles.logoContainer}>
-          <Heart size={60} color="#FFFFFF" strokeWidth={2} />
-          <Text style={styles.logoText}>LoveConnect</Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.logo}><MessageCircle size={62} color="#FFFFFF" /></View>
+      <Text style={styles.title}>WhatsApp Clone</Text>
+      <Text style={styles.subtitle}>Realtime chat, status, calls, and profile controls backed by scalable services.</Text>
 
-        <View style={styles.featuresContainer}>
-          <View style={styles.feature}>
-            <Users size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Find Your Match</Text>
-          </View>
-          <View style={styles.feature}>
-            <Sparkles size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Smart Matching</Text>
-          </View>
-          <View style={styles.feature}>
-            <Heart size={24} color="#FFFFFF" strokeWidth={2} />
-            <Text style={styles.featureText}>Real Connections</Text>
-          </View>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => router.push('/auth')}
-          >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/auth?mode=signin')}
-          >
-            <Text style={styles.secondaryButtonText}>I Already Have an Account</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.featureList}>
+        <View style={styles.featureRow}><Lock size={16} color="#065F46" /><Text style={styles.featureText}>Secure encrypted messaging</Text></View>
+        <View style={styles.featureRow}><Phone size={16} color="#065F46" /><Text style={styles.featureText}>Call logs and quick dial actions</Text></View>
+        <View style={styles.featureRow}><ShieldCheck size={16} color="#065F46" /><Text style={styles.featureText}>Profile and privacy controls</Text></View>
       </View>
-    </LinearGradient>
+
+      <TouchableOpacity style={styles.primaryButton} onPress={() => router.replace('/(tabs)')}>
+        <Text style={styles.primaryButtonText}>Open App</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 60,
-  },
-  logoText: {
-    fontSize: 36,
-    fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-    marginTop: 16,
-  },
-  featuresContainer: {
-    marginBottom: 80,
-  },
-  feature: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  featureText: {
-    fontSize: 18,
-    fontFamily: 'Inter-Medium',
-    color: '#FFFFFF',
-    marginLeft: 16,
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 16,
-  },
-  primaryButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    fontSize: 18,
-    fontFamily: 'Inter-SemiBold',
-    color: '#3B82F6',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-Medium',
-    color: '#FFFFFF',
-  },
-  loadingText: {
-    fontSize: 18,
-    fontFamily: 'Inter-Medium',
-    color: '#666666',
-  },
+  container: { flex: 1, backgroundColor: '#075E54', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
+  logo: { width: 96, height: 96, borderRadius: 48, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', marginBottom: 24 },
+  title: { fontSize: 30, fontFamily: 'Inter-Bold', color: '#FFFFFF' },
+  subtitle: { marginTop: 12, fontSize: 15, lineHeight: 22, textAlign: 'center', fontFamily: 'Inter-Regular', color: '#D1FAE5' },
+  featureList: { marginTop: 20, backgroundColor: '#ECFDF3', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, width: '100%' },
+  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 },
+  featureText: { fontSize: 13, color: '#065F46', fontFamily: 'Inter-Medium' },
+  primaryButton: { marginTop: 28, backgroundColor: '#25D366', paddingVertical: 14, paddingHorizontal: 36, borderRadius: 28 },
+  primaryButtonText: { fontSize: 16, fontFamily: 'Inter-SemiBold', color: '#FFFFFF' },
 });
