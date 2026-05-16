@@ -3,6 +3,18 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
+class ContactOut(BaseModel):
+    id: str
+    display_name: str
+    phone: str
+    about: str = 'Available'
+
+
+class ChatCreate(BaseModel):
+    contact_id: str = Field(min_length=1)
+    title: str = Field(min_length=1, max_length=120)
+
+
 class ChatSummary(BaseModel):
     id: str
     title: str

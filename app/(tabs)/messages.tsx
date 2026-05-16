@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
 import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Phone } from 'lucide-react-native';
 
 import { Call, createCall, listCalls } from '../lib/socialApi';
@@ -11,6 +12,7 @@ function directionIcon(direction: string) {
 }
 
 export default function CallsScreen() {
+  const router = useRouter();
   const [calls, setCalls] = useState<Call[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +32,7 @@ export default function CallsScreen() {
   const onQuickCall = async () => {
     const next = await createCall(topName);
     setCalls((prev) => [next, ...prev]);
+    router.push({ pathname: '/call-screen', params: { name: topName, mode: 'audio' } });
   };
 
   return (
@@ -44,13 +47,13 @@ export default function CallsScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
-            <View style={styles.callRow}>
+            <TouchableOpacity style={styles.callRow} onPress={() => router.push({ pathname: '/call-screen', params: { name: item.peer_name, mode: 'audio' } })}>
               <View style={styles.avatar}><Text style={styles.avatarText}>{item.peer_name.slice(0, 2).toUpperCase()}</Text></View>
               <View style={styles.callContent}>
                 <Text style={styles.callName}>{item.peer_name}</Text>
                 <View style={styles.callMeta}>{directionIcon(item.direction)}<Text style={styles.callTime}>{new Date(item.created_at).toLocaleString()}</Text></View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}

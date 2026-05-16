@@ -23,6 +23,8 @@ docker compose up --build
 
 ## Endpoints
 - `POST /auth/dev-token` -> returns `access_token` for a `user_id`.
+- `GET /api/v1/chats/contacts` -> contact directory for starting new chats.
+- `POST /api/v1/chats` -> authenticated chat creation by contact.
 - `GET /api/v1/chats` -> authenticated chat summaries.
 - `GET /api/v1/chats/{chat_id}/messages` -> authenticated message history.
 - `POST /api/v1/chats/messages` -> authenticated message send path.

@@ -3,6 +3,13 @@ const USER_ID = process.env.EXPO_PUBLIC_CHAT_USER_ID ?? 'demo-user';
 
 let tokenCache: string | null = null;
 
+export type Contact = {
+  id: string;
+  display_name: string;
+  phone: string;
+  about: string;
+};
+
 export type ChatSummary = {
   id: string;
   title: string;
@@ -19,7 +26,7 @@ export type ChatMessage = {
   created_at: string;
 };
 
-async function getToken(): Promise<string> {
+export async function getAuthToken(): Promise<string> {
   if (tokenCache) return tokenCache;
 
   const response = await fetch(`${API_BASE_URL}/auth/dev-token`, {
@@ -36,11 +43,33 @@ async function getToken(): Promise<string> {
   return body.access_token;
 }
 
-async function authHeaders(): Promise<Record<string, string>> {
+export async function authHeaders(): Promise<Record<string, string>> {
   return {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${await getToken()}`,
+    Authorization: `Bearer ${await getAuthToken()}`,
   };
+}
+
+export async function fetchContacts(): Promise<Contact[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/chats/contacts`, {
+    headers: await authHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch contacts: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function createChat(contact: Contact): Promise<ChatSummary> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/chats`, {
+    method: 'POST',
+    headers: await authHeaders(),
+    body: JSON.stringify({ contact_id: contact.id, title: contact.display_name }),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to create chat: ${response.status}`);
+  }
+  return response.json();
 }
 
 export async function fetchChats(): Promise<ChatSummary[]> {

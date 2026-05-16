@@ -1,25 +1,6 @@
-import { currentUserId, fetchChats } from './chatApi';
+import { authHeaders, fetchChats } from './chatApi';
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_CHAT_API_URL ?? 'http://localhost:8000';
-
-let tokenCache: string | null = null;
-
-async function getToken(): Promise<string> {
-  if (tokenCache) return tokenCache;
-  const response = await fetch(`${API_BASE_URL}/auth/dev-token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: currentUserId() }),
-  });
-  if (!response.ok) throw new Error('auth token failed');
-  const data = (await response.json()) as { access_token: string };
-  tokenCache = data.access_token;
-  return data.access_token;
-}
-
-async function authHeaders() {
-  return { 'Content-Type': 'application/json', Authorization: `Bearer ${await getToken()}` };
-}
 
 export type Status = { id: string; text: string; created_at: string; user_id: string };
 export type Call = { id: string; peer_name: string; direction: string; created_at: string; user_id: string };

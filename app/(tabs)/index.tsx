@@ -40,7 +40,7 @@ export default function ChatsScreen() {
           <TouchableOpacity style={styles.iconButton}>
             <Camera size={20} color="#1F2937" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/new-chat')}>
             <SquarePen size={20} color="#1F2937" />
           </TouchableOpacity>
         </View>

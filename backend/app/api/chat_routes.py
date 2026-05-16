@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from app.core.deps import get_current_user_id
 from app.core.rate_limit import InMemoryRateLimiter
 from app.db.mongo import get_db
-from app.models.chat import MessageIn, MessageOut
+from app.models.chat import ChatCreate, ChatSummary, ContactOut, MessageIn, MessageOut
 from app.services.chat_service import ChatService
 
 router = APIRouter(prefix='/chats', tags=['chats'])
@@ -12,6 +12,21 @@ write_limiter = InMemoryRateLimiter(max_requests=60, period_seconds=60)
 
 def get_service() -> ChatService:
     return ChatService(get_db())
+
+
+@router.get('/contacts', response_model=list[ContactOut])
+async def list_contacts(service: ChatService = Depends(get_service)):
+    return await service.list_contacts()
+
+
+@router.post('', response_model=ChatSummary)
+async def create_chat(
+    payload: ChatCreate,
+    service: ChatService = Depends(get_service),
+    user_id: str = Depends(get_current_user_id),
+):
+    write_limiter.check(f'user:{user_id}:create_chat')
+    return await service.create_chat(user_id=user_id, payload=payload)
 
 
 @router.get('')

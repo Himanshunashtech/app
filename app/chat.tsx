@@ -46,13 +46,13 @@ export default function ChatScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={20} color="#FFFFFF" />
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
+        <TouchableOpacity style={styles.headerInfo} onPress={() => router.push({ pathname: '/contact-info', params: { chatId: String(chatId), name: String(name), status: String(status) } })}>
           <Text style={styles.headerName}>{String(name)}</Text>
           <Text style={styles.headerStatus}>{String(status)}</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.iconButton}><Video size={18} color="#FFFFFF" /></TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}><Phone size={18} color="#FFFFFF" /></TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/call-screen', params: { name: String(name), mode: 'video' } })}><Video size={18} color="#FFFFFF" /></TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => router.push({ pathname: '/call-screen', params: { name: String(name), mode: 'audio' } })}><Phone size={18} color="#FFFFFF" /></TouchableOpacity>
         </View>
       </View>
 

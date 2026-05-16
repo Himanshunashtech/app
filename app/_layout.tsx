@@ -40,6 +40,10 @@ export default function RootLayout() {
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="chat" />
+          <Stack.Screen name="new-chat" />
+          <Stack.Screen name="contact-info" />
+          <Stack.Screen name="call-screen" />
+          <Stack.Screen name="status-viewer" />
           <Stack.Screen name="notifications" />
         </Stack>
         <StatusBar style="auto" />

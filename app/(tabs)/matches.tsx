@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 
 import { listStatuses, postStatus, Status } from '../lib/socialApi';
 
 export default function StatusScreen() {
+  const router = useRouter();
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(true);
@@ -44,14 +46,14 @@ export default function StatusScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
-            <View style={styles.statusRow}>
+            <TouchableOpacity style={styles.statusRow} onPress={() => router.push({ pathname: '/status-viewer', params: { name: item.user_id, text: item.text, createdAt: item.created_at } })}>
               <View style={styles.avatar}><Text style={styles.avatarText}>YO</Text></View>
               <View style={styles.statusContent}>
                 <Text style={styles.name}>{item.user_id}</Text>
                 <Text style={styles.message}>{item.text}</Text>
                 <Text style={styles.time}>{new Date(item.created_at).toLocaleString()}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
