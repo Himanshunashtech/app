@@ -1,55 +1,59 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { PhoneIncoming, PhoneOutgoing, PhoneMissed, Phone } from 'lucide-react-native';
 
-import { addCallRecord, CallRecord, getCallRecords } from '../lib/featureStore';
+import { Call, createCall, listCalls } from '../lib/socialApi';
 
-function directionIcon(direction: CallRecord['direction']) {
+function directionIcon(direction: string) {
   if (direction === 'incoming') return <PhoneIncoming size={16} color="#16A34A" />;
   if (direction === 'outgoing') return <PhoneOutgoing size={16} color="#2563EB" />;
   return <PhoneMissed size={16} color="#DC2626" />;
 }
 
 export default function CallsScreen() {
-  const [calls, setCalls] = useState<CallRecord[]>([]);
+  const [calls, setCalls] = useState<Call[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void getCallRecords().then(setCalls);
+    const load = async () => {
+      try {
+        setCalls(await listCalls());
+      } finally {
+        setLoading(false);
+      }
+    };
+    void load();
   }, []);
 
-  const topName = useMemo(() => calls[0]?.name ?? 'Recent Contact', [calls]);
+  const topName = useMemo(() => calls[0]?.peer_name ?? 'Recent Contact', [calls]);
 
   const onQuickCall = async () => {
-    const next = await addCallRecord(topName);
-    setCalls(next);
+    const next = await createCall(topName);
+    setCalls((prev) => [next, ...prev]);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Calls</Text>
-        <TouchableOpacity style={styles.iconButton} onPress={onQuickCall}>
-          <Phone size={20} color="#FFFFFF" />
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={onQuickCall}><Phone size={20} color="#FFFFFF" /></TouchableOpacity>
       </View>
-
-      <FlatList
-        data={calls}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <View style={styles.callRow}>
-            <View style={styles.avatar}><Text style={styles.avatarText}>{item.name.slice(0, 2).toUpperCase()}</Text></View>
-            <View style={styles.callContent}>
-              <Text style={styles.callName}>{item.name}</Text>
-              <View style={styles.callMeta}>
-                {directionIcon(item.direction)}
-                <Text style={styles.callTime}>{new Date(item.timestamp).toLocaleString()}</Text>
+      {loading ? <ActivityIndicator style={{ marginTop: 20 }} color="#128C7E" /> : (
+        <FlatList
+          data={calls}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <View style={styles.callRow}>
+              <View style={styles.avatar}><Text style={styles.avatarText}>{item.peer_name.slice(0, 2).toUpperCase()}</Text></View>
+              <View style={styles.callContent}>
+                <Text style={styles.callName}>{item.peer_name}</Text>
+                <View style={styles.callMeta}>{directionIcon(item.direction)}<Text style={styles.callTime}>{new Date(item.created_at).toLocaleString()}</Text></View>
               </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
     </View>
   );
 }

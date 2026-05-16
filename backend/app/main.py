@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from socketio import ASGIApp
 
 from app.api.chat_routes import router as chat_router
+from app.api.social_routes import router as social_router
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
@@ -13,6 +14,7 @@ from app.core.security import create_token
 from app.db.mongo import close_mongo, get_db
 from app.realtime.socket_server import sio
 from app.services.chat_service import ChatService
+from app.services.social_service import SocialService
 
 settings = get_settings()
 
@@ -20,8 +22,10 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     configure_logging()
-    service = ChatService(get_db())
-    await service.ensure_indexes()
+    chat_service = ChatService(get_db())
+    social_service = SocialService(get_db())
+    await chat_service.ensure_indexes()
+    await social_service.ensure_indexes()
     yield
     await close_mongo()
 
@@ -38,6 +42,7 @@ app.add_middleware(
 )
 
 app.include_router(chat_router, prefix=settings.api_prefix)
+app.include_router(social_router, prefix=settings.api_prefix)
 
 
 @app.get('/health')

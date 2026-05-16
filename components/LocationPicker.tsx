@@ -89,7 +89,7 @@ export default function LocationPicker({ onLocationSelected, selectedLocation }:
 
       if (reverseGeocodedAddress.length > 0) {
         const address = reverseGeocodedAddress[0];
-        const city = address.city || address.subAdministrativeArea || address.region || 'Unknown City';
+        const city = address.city || address.district || address.region || 'Unknown City';
         
         const locationData = {
           city,

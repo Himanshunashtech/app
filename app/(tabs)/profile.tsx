@@ -1,53 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Switch, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Switch, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
-import { getUserProfile, saveUserProfile, UserProfile } from '../lib/userStore';
+import { getProfile, Profile, updateProfile } from '../lib/socialApi';
 
 export default function SettingsScreen() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    void getUserProfile().then(setProfile);
+    void getProfile().then(setProfile);
   }, []);
 
   const onSave = async () => {
     if (!profile) return;
-    await saveUserProfile(profile);
+    const updated = await updateProfile({
+      display_name: profile.display_name,
+      about: profile.about,
+      phone: profile.phone,
+      notifications_enabled: profile.notifications_enabled,
+      read_receipts_enabled: profile.read_receipts_enabled,
+    });
+    setProfile(updated);
     setSaved(true);
     setTimeout(() => setSaved(false), 1200);
   };
 
-  if (!profile) return <View style={styles.container} />;
+  if (!profile) return <ActivityIndicator style={{ marginTop: 80 }} color="#128C7E" />;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Settings</Text>
       <View style={styles.section}>
         <Text style={styles.label}>Display name</Text>
-        <TextInput value={profile.displayName} onChangeText={(displayName) => setProfile({ ...profile, displayName })} style={styles.input} />
-
+        <TextInput value={profile.display_name} onChangeText={(display_name) => setProfile({ ...profile, display_name })} style={styles.input} />
         <Text style={styles.label}>About</Text>
         <TextInput value={profile.about} onChangeText={(about) => setProfile({ ...profile, about })} style={styles.input} />
-
         <Text style={styles.label}>Phone</Text>
         <TextInput value={profile.phone} onChangeText={(phone) => setProfile({ ...profile, phone })} style={styles.input} keyboardType="phone-pad" />
       </View>
 
       <View style={styles.section}>
-        <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Notifications</Text>
-          <Switch value={profile.notificationsEnabled} onValueChange={(value) => setProfile({ ...profile, notificationsEnabled: value })} />
-        </View>
-        <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Read receipts</Text>
-          <Switch value={profile.readReceiptsEnabled} onValueChange={(value) => setProfile({ ...profile, readReceiptsEnabled: value })} />
-        </View>
+        <View style={styles.switchRow}><Text style={styles.switchLabel}>Notifications</Text><Switch value={profile.notifications_enabled} onValueChange={(notifications_enabled) => setProfile({ ...profile, notifications_enabled })} /></View>
+        <View style={styles.switchRow}><Text style={styles.switchLabel}>Read receipts</Text><Switch value={profile.read_receipts_enabled} onValueChange={(read_receipts_enabled) => setProfile({ ...profile, read_receipts_enabled })} /></View>
       </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={onSave}>
-        <Text style={styles.saveButtonText}>{saved ? 'Saved' : 'Save changes'}</Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.saveButton} onPress={onSave}><Text style={styles.saveButtonText}>{saved ? 'Saved' : 'Save changes'}</Text></TouchableOpacity>
     </ScrollView>
   );
 }

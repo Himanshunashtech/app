@@ -344,7 +344,7 @@ export default function OnboardingScreen() {
       case 'multi_select':
         return (
           <View style={styles.multiSelectContainer}>
-            {step.options!.map((option: string) => (
+            {step.options!.map((option: any) => (
               <TouchableOpacity
                 key={option}
                 style={[
@@ -353,7 +353,8 @@ export default function OnboardingScreen() {
                 ]}
                 onPress={() => {
                   const current = answers[step.field!] || [];
-                  const optionLower = option.toLowerCase();
+                  const optionLabel = typeof option === 'string' ? option : option.label;
+                  const optionLower = optionLabel.toLowerCase();
                   const newValue = current.includes(optionLower)
                     ? current.filter((item: string) => item !== optionLower)
                     : [...current, optionLower];
@@ -364,7 +365,7 @@ export default function OnboardingScreen() {
                   styles.interestText,
                   (answers[step.field!] || []).includes(option.toLowerCase()) && styles.selectedInterestText
                 ]}>
-                  {option}
+                  {typeof option === 'string' ? option : option.label}
                 </Text>
               </TouchableOpacity>
             ))}

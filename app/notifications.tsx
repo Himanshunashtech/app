@@ -129,7 +129,7 @@ export default function NotificationsScreen() {
             pathname: '/chat',
             params: {
               matchId: notification.data.matchId,
-              profileName: notification.source_profile?.first_name || 'User',
+              profileName: (notification as any).source_profile?.first_name || 'User',
             },
           });
         }
@@ -170,8 +170,8 @@ export default function NotificationsScreen() {
     >
       <View style={styles.notificationContent}>
         <View style={styles.avatarContainer}>
-          {item.source_profile?.photos && item.source_profile.photos.length > 0 ? (
-            <Image source={{ uri: item.source_profile.photos[0] }} style={styles.avatar} />
+          {(item as any).source_profile?.photos && (item as any).source_profile.photos.length > 0 ? (
+            <Image source={{ uri: (item as any).source_profile.photos[0] }} style={styles.avatar} />
           ) : (
             <View style={styles.noAvatarContainer}>
               <User size={24} color="#9CA3AF" />

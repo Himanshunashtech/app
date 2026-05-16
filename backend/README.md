@@ -26,6 +26,9 @@ docker compose up --build
 - `GET /api/v1/chats` -> authenticated chat summaries.
 - `GET /api/v1/chats/{chat_id}/messages` -> authenticated message history.
 - `POST /api/v1/chats/messages` -> authenticated message send path.
+- `GET /api/v1/social/statuses`, `POST /api/v1/social/statuses` -> authenticated status timeline + publish.
+- `GET /api/v1/social/calls`, `POST /api/v1/social/calls` -> authenticated call history + call create.
+- `GET /api/v1/social/profile`, `PUT /api/v1/social/profile` -> authenticated profile read/update.
 
 ## Scale strategy
 - Deploy API replicas behind L4/L7 load balancer.

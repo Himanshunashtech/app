@@ -24,10 +24,10 @@ export default function AgeSelector({ selectedAge, onAgeSelected }: AgeSelectorP
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.selector, selectedAge && styles.selectedSelector]}
+        style={[styles.selector, Boolean(selectedAge) && styles.selectedSelector]}
         onPress={() => setShowPicker(true)}
       >
-        <Text style={[styles.selectorText, selectedAge && styles.selectedSelectorText]}>
+        <Text style={[styles.selectorText, Boolean(selectedAge) && styles.selectedSelectorText]}>
           {selectedAge ? `${selectedAge} years old` : 'Select your age'}
         </Text>
         <ChevronDown size={24} color={selectedAge ? '#3B82F6' : '#9CA3AF'} />
