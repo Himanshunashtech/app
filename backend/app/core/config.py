@@ -19,6 +19,9 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = Field(default_factory=lambda: ['*'])
 
+    auth_secret: str = Field(default='change-me-in-prod')
+    rate_limit_per_minute: int = Field(default=240)
+
 
 @lru_cache
 def get_settings() -> Settings:

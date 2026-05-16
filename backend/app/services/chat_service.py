@@ -34,7 +34,11 @@ class ChatService:
             )
         return items
 
-    async def list_messages(self, chat_id: str, limit: int = 100) -> list[MessageOut]:
+    async def list_messages(self, chat_id: str, user_id: str, limit: int = 100) -> list[MessageOut]:
+        chat = await self._db.chats.find_one({'_id': chat_id, 'participant_ids': user_id}, {'_id': 1})
+        if not chat:
+            return []
+
         cursor = (
             self._db.messages.find({'chat_id': chat_id})
             .sort('created_at', -1)
