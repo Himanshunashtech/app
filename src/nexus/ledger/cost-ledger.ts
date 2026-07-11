@@ -1,3 +1,4 @@
+import { DEFAULT_MODEL_REGISTRY, estimateRegistryEntryCost } from '../config/model-registry';
 import type { CostEntry } from '../types';
 
 export class InMemoryCostLedger {
@@ -17,11 +18,10 @@ export class InMemoryCostLedger {
 }
 
 export function estimateCostUsd(model: string, inputTokens: number, outputTokens: number, cacheHit = false): number {
-  const ratesPerMillion = model.includes('opus')
-    ? { input: 15, output: 75 }
-    : model.includes('sonnet')
-      ? { input: 3, output: 15 }
-      : { input: 0.8, output: 4 };
-  const inputRate = cacheHit ? ratesPerMillion.input * 0.1 : ratesPerMillion.input;
-  return (inputTokens * inputRate + outputTokens * ratesPerMillion.output) / 1_000_000;
+  const entry = DEFAULT_MODEL_REGISTRY.find((candidate) => candidate.model === model);
+  if (entry) return estimateRegistryEntryCost(entry, inputTokens, outputTokens, cacheHit);
+
+  const conservativeFallbackRates = { inputUsdPerMillion: 5, outputUsdPerMillion: 20 };
+  const inputRate = cacheHit ? conservativeFallbackRates.inputUsdPerMillion * 0.1 : conservativeFallbackRates.inputUsdPerMillion;
+  return (inputTokens * inputRate + outputTokens * conservativeFallbackRates.outputUsdPerMillion) / 1_000_000;
 }

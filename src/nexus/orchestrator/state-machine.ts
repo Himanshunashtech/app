@@ -14,14 +14,18 @@ export class NexusOrchestrator {
 
   async run(message: InternalMessage, options: OrchestratorOptions = {}): Promise<AgentResult> {
     const classification = classifyTask(message.text);
-    const model = routeModel(classification);
+    const estimatedInputTokens = Math.ceil(message.text.length / 4) + 700;
+    const estimatedOutputTokensForRouting = classification.estimatedSteps * 160;
+    const model = routeModel(classification, {
+      estimatedInputTokens,
+      estimatedOutputTokens: estimatedOutputTokensForRouting,
+    });
     const governor = new CostGovernor({
       dailyCapUsd: options.dailyCapUsd ?? 5,
       taskBudgetUsd: options.taskBudgetUsd ?? Math.max(0.01, classification.tokenBudget * 0.00001),
     });
     const taskId = `task_${message.id}`;
-    const estimatedInputTokens = Math.ceil(message.text.length / 4) + 700;
-    const estimatedOutputTokens = Math.min(model.maxOutputTokens, classification.estimatedSteps * 160);
+    const estimatedOutputTokens = Math.min(model.maxOutputTokens, estimatedOutputTokensForRouting);
     const estimatedCost = estimateCostUsd(model.model, estimatedInputTokens, estimatedOutputTokens, true);
     const gate = governor.checkBeforeCall(estimatedCost);
 

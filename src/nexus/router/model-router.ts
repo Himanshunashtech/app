@@ -1,27 +1,37 @@
-import type { ModelChoice, TaskClassification } from '../types';
+import { estimateRegistryEntryCost, selectCheapestAvailableModel, type EnvReader } from '../config/model-registry';
+import type { ModelChoice, ModelTier, TaskClassification } from '../types';
 
-const MODEL_BY_TIER = {
-  haiku: { provider: 'anthropic', model: 'claude-3-5-haiku-latest', maxOutputTokens: 1024 },
-  sonnet: { provider: 'anthropic', model: 'claude-sonnet-4-20250514', maxOutputTokens: 4096 },
-  opus: { provider: 'anthropic', model: 'claude-opus-4-20250514', maxOutputTokens: 8192 },
-  gemini_flash: { provider: 'google', model: 'gemini-2.0-flash', maxOutputTokens: 2048 },
-} as const;
+export interface RouteModelOptions {
+  estimatedInputTokens?: number;
+  estimatedOutputTokens?: number;
+  env?: EnvReader;
+}
 
-export function routeModel(classification: TaskClassification): ModelChoice {
-  const tier = classification.complexity === 'trivial'
-    ? 'haiku'
-    : classification.complexity === 'hard_reasoning' || classification.estimatedSteps > 8
-      ? 'opus'
-      : classification.suggestedModel === 'gemini_flash'
-        ? 'gemini_flash'
-        : 'sonnet';
-  const selected = MODEL_BY_TIER[tier];
+export function routeModel(classification: TaskClassification, options: RouteModelOptions = {}): ModelChoice {
+  const targetTier = targetTierFor(classification);
+  const estimatedInputTokens = options.estimatedInputTokens ?? Math.ceil(classification.tokenBudget * 0.35);
+  const estimatedOutputTokens = options.estimatedOutputTokens ?? Math.ceil(classification.tokenBudget * 0.2);
+  const selected = selectCheapestAvailableModel(targetTier, estimatedInputTokens, estimatedOutputTokens, options.env);
+  const estimatedCostUsd = estimateRegistryEntryCost(selected, estimatedInputTokens, estimatedOutputTokens, true);
 
   return {
-    tier,
+    tier: selected.tier,
     provider: selected.provider,
     model: selected.model,
     maxOutputTokens: Math.min(selected.maxOutputTokens, Math.max(512, Math.floor(classification.tokenBudget / 2))),
-    rationale: `Routed ${classification.complexity} ${classification.domain} task with ${classification.estimatedSteps} estimated step(s) to ${tier}.`,
+    rationale: [
+      `Targeted ${targetTier} for ${classification.complexity} ${classification.domain} task with ${classification.estimatedSteps} estimated step(s).`,
+      selected.available ? `Selected cheapest configured ${selected.provider} model.` : `No API key was configured; selected cheapest ${selected.provider} fallback metadata.`,
+    ].join(' '),
+    apiKeyEnvVar: selected.envKey,
+    apiKeyConfigured: selected.available,
+    estimatedCostUsd,
   };
+}
+
+function targetTierFor(classification: TaskClassification): ModelTier {
+  if (classification.complexity === 'trivial') return 'haiku';
+  if (classification.complexity === 'hard_reasoning' || classification.estimatedSteps > 8) return 'opus';
+  if (classification.suggestedModel === 'gemini_flash') return 'gemini_flash';
+  return 'sonnet';
 }

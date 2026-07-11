@@ -1,6 +1,7 @@
 export type TaskComplexity = 'trivial' | 'simple' | 'moderate' | 'complex' | 'hard_reasoning';
 export type TaskDomain = 'coding' | 'writing' | 'research' | 'scheduling' | 'other';
 export type ModelTier = 'haiku' | 'sonnet' | 'opus' | 'gemini_flash';
+export type ModelProvider = 'anthropic' | 'openai' | 'google' | 'mistral' | 'xai' | 'deepseek' | 'groq' | 'openrouter';
 
 export interface InternalMessage {
   id: string;
@@ -24,10 +25,13 @@ export interface TaskClassification {
 
 export interface ModelChoice {
   tier: ModelTier;
-  provider: 'anthropic' | 'google';
+  provider: ModelProvider;
   model: string;
   maxOutputTokens: number;
   rationale: string;
+  apiKeyEnvVar: string;
+  apiKeyConfigured: boolean;
+  estimatedCostUsd: number;
 }
 
 export interface CostEntry {
