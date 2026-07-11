@@ -19,6 +19,40 @@ export interface RuntimeModelEntry extends ModelRegistryEntry {
 export type EnvReader = Pick<NodeJS.ProcessEnv, string>;
 
 export const DEFAULT_MODEL_REGISTRY: readonly ModelRegistryEntry[] = Object.freeze([
+
+  {
+    tier: 'haiku',
+    provider: 'ollama',
+    model: 'llama3.1:8b',
+    envKey: 'OLLAMA_BASE_URL',
+    inputUsdPerMillion: 0,
+    outputUsdPerMillion: 0,
+    maxOutputTokens: 2048,
+    supportsToolUse: true,
+    supportsVision: false,
+  },
+  {
+    tier: 'sonnet',
+    provider: 'ollama',
+    model: 'qwen2.5-coder:32b',
+    envKey: 'OLLAMA_BASE_URL',
+    inputUsdPerMillion: 0,
+    outputUsdPerMillion: 0,
+    maxOutputTokens: 4096,
+    supportsToolUse: true,
+    supportsVision: false,
+  },
+  {
+    tier: 'sonnet',
+    provider: 'lm_studio',
+    model: 'local-model',
+    envKey: 'LM_STUDIO_BASE_URL',
+    inputUsdPerMillion: 0,
+    outputUsdPerMillion: 0,
+    maxOutputTokens: 4096,
+    supportsToolUse: true,
+    supportsVision: true,
+  },
   {
     tier: 'haiku',
     provider: 'anthropic',

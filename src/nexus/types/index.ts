@@ -1,7 +1,7 @@
 export type TaskComplexity = 'trivial' | 'simple' | 'moderate' | 'complex' | 'hard_reasoning';
 export type TaskDomain = 'coding' | 'writing' | 'research' | 'scheduling' | 'other';
 export type ModelTier = 'haiku' | 'sonnet' | 'opus' | 'gemini_flash';
-export type ModelProvider = 'anthropic' | 'openai' | 'google' | 'mistral' | 'xai' | 'deepseek' | 'groq' | 'openrouter';
+export type ModelProvider = 'anthropic' | 'openai' | 'google' | 'mistral' | 'xai' | 'deepseek' | 'groq' | 'openrouter' | 'ollama' | 'lm_studio';
 
 export interface InternalMessage {
   id: string;
