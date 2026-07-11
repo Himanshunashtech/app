@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "cross-env EXPO_NO_TELEMETRY=1 expo start",
     "build:web": "expo export --platform web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "typecheck:nexus": "tsc -p tsconfig.nexus.json --noEmit",
+    "test:nexus": "rm -rf .tmp/nexus-build && tsc -p tsconfig.nexus.json && node --test tests/nexus/*.test.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.1",
